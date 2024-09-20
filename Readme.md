@@ -3,6 +3,7 @@
 GenAL: Generative Agent for Adaptive Learning
 
 <!-- 使用 HTML 标签来缩小图片 -->
+
 <img src="GenAL.png" alt="GenAL" width="800"/>
 
 ## Data
@@ -22,4 +23,4 @@ We use cuda-11.7 version.
 
 ## Run
 
-`python main.py`
+`python ./agents/main.py`
