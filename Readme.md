@@ -1,1 +1,1 @@
-Codes fo GenAL
+Codes for GenAL
