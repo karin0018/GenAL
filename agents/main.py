@@ -3,7 +3,6 @@ import json
 from tqdm import tqdm
 from agent_global import GlobalPlanner
 from agent_local import LocalPlanner
-from agent_learner import AgentLearner
 import random
 import numpy as np
 from Train_KT_Agent import DKT
@@ -45,8 +44,6 @@ def gen(dataname, model,max_step, reflection=True,q_text=True, llm=None, tokeniz
         with open(datapath+"/k2q.json", "r") as f:
             k2q = json.load(f)
             
-    
-    
     all_stu_lr_state4everygoal = {}
 
     goal_id_list = list(random.sample(range(len(k2text)), GOAL_NUM))
@@ -61,9 +58,6 @@ def gen(dataname, model,max_step, reflection=True,q_text=True, llm=None, tokeniz
                 initial_ans_log = answers[stu][:COLD_NUM]
                 all_stu_lr_state4everygoal[stu] = []
                 
-                
-                learner = AgentLearner(llm, tokenizer,chat_model=CHAT_MODEL)
-                        
                 global_planner = GlobalPlanner(llm, tokenizer,dataname=dataname,chat_model=CHAT_MODEL,q_text=q_text, reflection=reflection)
                 local_planner = LocalPlanner(llm, tokenizer,dataname,chat_model=CHAT_MODEL,q_text=q_text, reflection=reflection)
                 print("=="*50) 
@@ -75,14 +69,6 @@ def gen(dataname, model,max_step, reflection=True,q_text=True, llm=None, tokeniz
                     global_planner.update_history_log(initial_ques_log[i], initial_ans_log[i], local_planner.q2text[str(initial_ques_log[i])], "correct" if int(initial_ans_log[i]) == 1 else "wrong")
                     
                 print('initial done!')
-                
-                
-                
-                
-                
-                
-                
-                
                 
                 for goal_id in goal_id_list:
                     goal_id = str(goal_id)
@@ -133,7 +119,6 @@ def gen(dataname, model,max_step, reflection=True,q_text=True, llm=None, tokeniz
                         break_flag = 0
                         while(1):
                             try:
-                                
                                 question_id = re.search(r"'question_id': (\d+)", advise).group(1) or re.search(r"'question_id': '(\d+)'", advise).group(1)
                                 recommand_reason = re.search(r"'recommand_reason': '([^']*)'", advise).group(1) or re.search(r"'recommand_reason': ([^']*)", advise).group(1)
                                 predict_answer = re.search(r"'predict_answer': '([^']*)'", advise).group(1) or re.search(r"'predict_answer': ([^']*)", advise).group(1)
@@ -154,9 +139,7 @@ def gen(dataname, model,max_step, reflection=True,q_text=True, llm=None, tokeniz
                                     
                                     advise, prompt = local_planner.given_advise(history_text,memory['history_log']['question_id'], student_profile, goal_id,memory['recommend_reflection'], all_learning_state, E_s_learning_state)
                                     
-                                
-                                
-                               
+
                         print('get advise:')
                         print(advise)
                         f.write(f"prompt:{prompt}\nadvise: {advise}\n")
@@ -164,7 +147,6 @@ def gen(dataname, model,max_step, reflection=True,q_text=True, llm=None, tokeniz
                         if break_flag:
                             break    
 
-                    
                         all_learning_state, kn_learning_state = global_planner.get_knowledge_state_by_KT(goal_id)
                         answer_bi = 1 if all_learning_state[int(question_id)] > 0.5 else 0
                         
