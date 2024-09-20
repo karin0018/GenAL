@@ -2,7 +2,8 @@
 
 GenAL: Generative Agent for Adaptive Learning
 
-![GenAL](GenAL.png)
+<!-- 使用 HTML 标签来缩小图片 -->
+<img src="GenAL.png" alt="GenAL" width="500"/>
 
 ## Data
 
