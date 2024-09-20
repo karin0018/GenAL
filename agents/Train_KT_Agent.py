@@ -1,4 +1,4 @@
-# coding: utf-8
+
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -52,8 +52,8 @@ class E_DKT(nn.Module):
     def apply_clipper(self):
         clipper = NoneNegClipper()
         self.fc.apply(clipper)
-        # self.prednet_full2.apply(clipper)
-        # self.prednet_full3.apply(clipper)
+        
+        
 
 class NoneNegClipper(object):
     def __init__(self):
@@ -78,11 +78,11 @@ class Data_EDKT(Dataset):
         q2k = data_directory_path + "/q2k.json"
         with open(q2k, 'r') as f:
             q2k_data = json.load(f)
-        # knowledge_path = data_directory_path + "knowledge_context2.json"
+        
         with open(question_path, 'r') as f:
             question_context = json.load(f)
-        # with open(knowledge_path, 'r') as f:
-        #     knowledge_context = json.load(f)
+        
+        
         with open(file_path, 'r') as f:
             for line_id, line in tqdm(enumerate(f)):
                 i = line_id % 3
@@ -91,7 +91,7 @@ class Data_EDKT(Dataset):
                     ques = [int(j) for j in ques]
                     ques_text = [str(question_context[str(j)]) for j in ques] 
                     self.ques.append(ques)
-                    self.ques_text.append(ques_text) # stu_num x seq_len x text-length
+                    self.ques_text.append(ques_text) 
                     input_knowedge_embs = []
                     for q in ques:
                         e_k = q2k_data[str(q)] if type(q2k_data[str(q)]) == list else [q2k_data[str(q)]]
@@ -108,7 +108,7 @@ class Data_EDKT(Dataset):
 
 
     def __getitem__(self, index):
-        # Get token embeddings from the BERT model
+        
         inputs = self.tokenizer(self.ques_text[index], return_tensors='pt', padding=True, truncation=True).to(device)
         outputs = self.bert(**inputs)
         sentence_embeddings = outputs.last_hidden_state.mean(dim=1)
@@ -145,7 +145,7 @@ def train_E_DKT(datapath, modelpath, item_num, knowledge_dim, bert_path = "../pr
     train_dataset, validate_dataset = torch.utils.data.random_split(dataset, [train_size, validate_size])
     data_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     validate_loader = DataLoader(dataset=validate_dataset, batch_size=BATCH_SIZE, shuffle=False)
-    # data_loader, validate_loader = data_loader.to(device), validate_loader.to(device)
+    
     
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     loss_func = nn.BCELoss()
@@ -183,11 +183,11 @@ def train_E_DKT(datapath, modelpath, item_num, knowledge_dim, bert_path = "../pr
             pred_epoch = torch.Tensor([]).to(device)
             gold_epoch = torch.Tensor([]).to(device)
             for batch in tqdm(validate_loader):
-                # 从 batch 中取出文本
+                
                 ques, ans, ques_text, kn_emb = batch
                 ques = ques.to(device)[:, :-1]
                 ans_tr = ans.to(device)[:, :-1]
-                # 添加文本
+                
                 ques_text = ques_text.to(device)[:,:-1]
                 kn_emb = kn_emb.to(device)[:,:-1]
                 pred= model(ques, ans_tr, ques_text, kn_emb)
@@ -204,7 +204,7 @@ def train_E_DKT(datapath, modelpath, item_num, knowledge_dim, bert_path = "../pr
             print('validate epoch: {}, loss: {}, auc: {}'.format(epoch, loss.item(), auc))
 
     print('best val auc: {}'.format(best_auc))
-    # save auc and epoch num to text file
+    
     with open(os.path.join(MODEL_PATH+'/Trained_E_DKT_details.txt'), 'w') as f:
         f.write('best val auc: {}'.format(best_auc))
         f.write('\n')
@@ -271,7 +271,7 @@ def train_KSS(datapath, modelpath, item_num):
     model.to(device)
     model.float()
 
-    dataset = Data_KSS(datapath+"/all_logs.txt") # './data_train_kt_agent/KSS_simu'
+    dataset = Data_KSS(datapath+"/all_logs.txt") 
     train_size = int(len(dataset) * 0.9)
     validate_size = len(dataset) - train_size
     print("train_size, validate_size,", train_size, validate_size)
@@ -281,7 +281,7 @@ def train_KSS(datapath, modelpath, item_num):
     with open(datapath + '/validate.json', 'w') as f:
         val = {"ques": [], "ans": []}
         for ques, ans in tqdm(validate_dataset):
-            # 假设数据是文本类型，如果不是，请适当调整输出格式
+            
             val["ques"].append(ques.tolist())
             val["ans"].append(ans.tolist())
         json.dump(val, f, indent=4)
@@ -314,7 +314,7 @@ def train_KSS(datapath, modelpath, item_num):
             optimizer.step()
         scheduler.step()
         auc = roc_auc_score(gold_epoch.cpu().detach().numpy(), pred_epoch.cpu().detach().numpy())
-        # print('train epoch: {}, loss: {}, auc: {}'.format(epoch, loss.item(), auc))
+        
 
         with torch.no_grad():
             model.eval()
@@ -338,7 +338,7 @@ def train_KSS(datapath, modelpath, item_num):
             print('validate epoch: {}, loss: {}, auc: {}'.format(epoch, loss.item(), auc))
 
     print('best val auc: {}'.format(best_auc))
-    # save auc and epoch num to text file
+    
     with open(modelpath + '/Trained_KSS_KT_details.txt', 'w') as f:
         f.write('best val auc: {}'.format(best_auc))
         f.write('\n')
@@ -349,38 +349,5 @@ def train_KSS(datapath, modelpath, item_num):
 
 if __name__ == '__main__':
     # train_E_DKT()
-    assist = {
-        "datapath": "/data/lvrui/agent4edurec/Adapt_learning_llm/data_o/assist",
-        "modelpath": "../pretrained_models/KES_assist_with_diff",
-        "item_num": 16891,
-        "knowledge_dim":111,
-        "bert_path" : "../pretrained_models/bert_base_cased"
-    }
-    junyi = {
-        "datapath": "/data/lvrui/agent4edurec/Adapt_learning_llm/data_o/junyi",
-        "modelpath": "../pretrained_models/KES_junyi_with_diff",
-        "item_num": 835,
-        "knowledge_dim": 41,
-        "bert_path" : "../pretrained_models/bert_base_cased"
-    }
-    xunfei = {
-        "datapath": "/data/lvrui/agent4edurec/Adapt_learning_llm/data_o/xunfei",
-        "modelpath": "../pretrained_models/KES_xunfei_with_diff",
-        "item_num": 8021,
-        "knowledge_dim": 698,
-        "bert_path" : "../pretrained_models/bert_base_chinese"
-    }
-    xunfei_cpu = {
-        "datapath": "/data/lvrui/agent4edurec/Adapt_learning_llm/data_o/xunfei",
-        "modelpath": "../pretrained_models/KES_xunfei_cpu",
-        "item_num": 8021,
-        # "knowledge_dim": 698,
-        # "bert_path" : "../pretrained_models/bert_base_chinese"
-    }
-    # train_E_DKT(**assist) # 0.6344268079271782
-    # train_E_DKT(**junyi) # acc = 0.698139155342454
-    # train_E_DKT(**xunfei)
-    # train_KSS(**assist)
-    # train_KSS(**junyi) # acc = 0.698139155342454
+
     print(device)
-    # train_KSS(**xunfei_cpu)

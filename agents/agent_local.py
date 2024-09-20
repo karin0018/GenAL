@@ -19,7 +19,7 @@ class LocalPlanner:
         self.learning_steps = 1
         self.dataname = dataname
        
-        if self.dataname == "assist" or self.dataname == "junyi" or dataname == "xunfei":
+        if self.dataname == "assist" or self.dataname == "junyi" or dataname == "TextLog":
             with open(self.main_data_path+f"/{dataname}/K_Directed.txt", "r") as file:
                 lines = file.readlines()
             with open(self.main_data_path+f"/{dataname}/k2text.json", 'r') as f:
@@ -31,7 +31,7 @@ class LocalPlanner:
             self.q2text = json.load(open(self.main_data_path+f"/{dataname}/q2text.json", 'r'))
             
         else:
-            print("only junyi / assist / xunfei are supported")
+            print("only junyi / assist / TextLog are supported")
             raise NotImplementedError
         
         self.k_graph = [tuple(map(int, line.strip().split())) for line in lines]

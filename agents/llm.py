@@ -10,7 +10,7 @@ import openai
 import torch
 import transformers
 from transformers import LlamaForCausalLM, LlamaTokenizer, PreTrainedTokenizerFast
-# from models.llama import LlamaInterface
+
 import logging
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -20,8 +20,8 @@ def get_llama2(model_dir="/data/share_weight/Llama-2-7b-chat-hf"):
     for logger in loggers:
         if "transformers" in logger.name.lower():
             logger.setLevel(logging.ERROR)
-    model = LlamaForCausalLM.from_pretrained(model_dir, device_map = 'auto')	# 初始化模型
-    tokenizer = LlamaTokenizer.from_pretrained(model_dir)	# 初始化tokenizer
+    model = LlamaForCausalLM.from_pretrained(model_dir, device_map = 'auto')	
+    tokenizer = LlamaTokenizer.from_pretrained(model_dir)	
     return model, tokenizer
 
 def get_llm(model_dir="/data/share_weight/Meta-Llama-3-8B-Instruct"):
@@ -29,28 +29,28 @@ def get_llm(model_dir="/data/share_weight/Meta-Llama-3-8B-Instruct"):
     for logger in loggers:
         if "transformers" in logger.name.lower():
             logger.setLevel(logging.ERROR)
-    model = LlamaForCausalLM.from_pretrained(model_dir, device_map = 'auto')	# 初始化模型
-    tokenizer = PreTrainedTokenizerFast.from_pretrained(model_dir,legacy=False)	# 初始化tokenizer
+    model = LlamaForCausalLM.from_pretrained(model_dir, device_map = 'auto')	
+    tokenizer = PreTrainedTokenizerFast.from_pretrained(model_dir,legacy=False)	
     return model, tokenizer
 
 class LlamaLLM:
     def __init__(self, model_dir="/data/share_weight/Llama-2-7b-chat-hf", model=None, tokenizer=None, *args, **kwargs):
 
         if model is None:
-            self.model = LlamaForCausalLM.from_pretrained(model_dir, device_map = 'auto')	# 初始化模型
-            self.tokenizer = LlamaTokenizer.from_pretrained(model_dir,legacy=False)	# 初始化tokenizer
+            self.model = LlamaForCausalLM.from_pretrained(model_dir, device_map = 'auto')	
+            self.tokenizer = LlamaTokenizer.from_pretrained(model_dir,legacy=False)	
         else:
             self.model = model
             self.tokenizer = tokenizer
             
-        # 使用模型
+        
         self.pipeline = transformers.pipeline(
             "text-generation",
             model=self.model,
             tokenizer=self.tokenizer,
             torch_dtype=torch.float16,
             device_map="auto",
-            # temperature=0.5
+            
         )
         self.terminators = [
             self.pipeline.tokenizer.eos_token_id,
@@ -59,7 +59,7 @@ class LlamaLLM:
         
     def __call__(self, prompt: str):
         messages = [
-            # {"role": "system", "content": "You are a pirate chatbot who always responds in pirate speak!"},
+            
             {"role": "user", "content": prompt},
         ]
         return self.pipeline(
@@ -96,7 +96,7 @@ class ChatGPT:
         return response.choices[0].message.content
 
 if __name__ == '__main__':
-    # model,tokenizer = get_llm()
-    # llm = LlamaLLM(model=model, tokenizer=tokenizer)
+    
+    
     llm = ChatGPT()
     print(llm("You're a seasoned math teacher with multiple years of teaching experience.Please use one sentence to summarize the student's learning ability from the following learning log: [{'question': '三角形ABC a b c=3 5 7 三角形 中最 大角', 'answer': 'True', 'select_reason and predict answer': ''}, {'question': '三角形ABC AB=3BC cosA=frac2sqrt23 cosB=', 'answer': 'True', 'select_reason and predict answer': ''}, {'question': 'abc 分别为 三角形ABC 内角 ABC 对边 a=3 b=4 C=60^circ c=', 'answer': 'True', 'select_reason and predict answer': ''}]"))

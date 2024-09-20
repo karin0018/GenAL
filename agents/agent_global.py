@@ -18,8 +18,8 @@ class GlobalPlanner:
         self.cold_num = 5
         self.memory = {
             'recommend_reflection':'', 
-            'history_log': {'question_id':[], 'answer_bi': []}, # (question_id, answer)
-            'history_log_text': [], # (question, answer, select_reason) 
+            'history_log': {'question_id':[], 'answer_bi': []}, 
+            'history_log_text': [], 
             'student_learning_ability':'',
             'student_learning_preference':''
         }
@@ -29,11 +29,11 @@ class GlobalPlanner:
         self.dataname = dataname
         self.QTEXT = q_text
         self.REFLECTION = reflection
-        if dataname == "assist" or dataname == "junyi" or dataname =="xunfei":
+        if dataname == "assist" or dataname == "junyi" or dataname =="TextLog":
             self.k_num = {
                 'assist':111,
                 'junyi': 41,
-                'xunfei':698
+                'TextLog':698
             }
             with open(f"../data_o/{dataname}/k2text.json",'r') as f:
                 self.k2text = json.load(f)
@@ -54,14 +54,14 @@ class GlobalPlanner:
             self.model = torch.load(f"../pretrained_models/KES_kss/Trained_KSS_KT_model.pt").to(device)
             self.model.eval()
         else:
-            print('only junyi / assist / xunfei  supported')
+            print('only junyi / assist / TextLog  supported')
             raise NotImplementedError
 
     
     def clear_memory(self, cold_num,):
         self.memory = {
             'recommend_reflection':'', 
-            'history_log': {'question_id':self.memory['history_log']['question_id'][:cold_num], 'answer_bi': self.memory['history_log']['answer_bi'][:cold_num]}, # 学习路径：(question_id, answer)
+            'history_log': {'question_id':self.memory['history_log']['question_id'][:cold_num], 'answer_bi': self.memory['history_log']['answer_bi'][:cold_num]}, 
             'history_log_text': self.memory['history_log_text'][:cold_num], 
             'student_learning_ability':'',
             'student_learning_preference':''
@@ -81,7 +81,7 @@ class GlobalPlanner:
         learning_state = np.mean([question_learning_state[int(i)].item() for i in question_list])
 
         return question_learning_state, learning_state
-        # return [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+        
 
     def update_history_log(self, question_id, answer_bi, question_content="", answer_content="", select_reason="",predict_answer=""):
         try:
