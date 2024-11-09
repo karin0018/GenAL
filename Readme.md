@@ -31,8 +31,15 @@ We designed 4 different prompts to test the influency of prompt sensitivity to o
 
 The part that is used to replace the prompt is the important module to the effectiveness of the recommendation in Local Teaching Agent. It should be note that, the original prompt is designed by educational expert and the other is re-writed by ChatGPT, aiming to enhance reasoning effectiveness.
 
+
 Original Prompt in our paper:
 
+> "Given the following history text: {history_text[-5:]} and the recommand reflection {recommend_reflection}, the student profile: {student_profile}, the knowledge learning goal: {learning_goal}. Here are the candidate question list: {candidates}. Please provide the most suitable question from above list, that can help the student to achieve the learning goal efficiently. For example, the output format should be :['question_id': 'xxx', 'recommand_reason': 'recommand reason details', 'predict_answer': 'True' or 'False'], except this format, please do not output anything."
+
+The prompt we used to re-write:
+
+> Here is a prompt template. Please rewrite three additional prompt templates to make the model's reasoning as effective as possible.
+>
 > "Given the following history text: {history_text[-5:]} and the recommand reflection {recommend_reflection}, the student profile: {student_profile}, the knowledge learning goal: {learning_goal}. Here are the candidate question list: {candidates}. Please provide the most suitable question from above list, that can help the student to achieve the learning goal efficiently. For example, the output format should be :['question_id': 'xxx', 'recommand_reason': 'recommand reason details', 'predict_answer': 'True' or 'False'], except this format, please do not output anything."
 
 P1:
