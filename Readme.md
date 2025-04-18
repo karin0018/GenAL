@@ -1,4 +1,4 @@
-# Codes for GenAL
+# Codes for GenAL (AAAI'20025 oral)
 
 GenAL: Generative Agent for Adaptive Learning
 
@@ -30,7 +30,6 @@ We use cuda-11.7 version.
 We designed 4 different prompts to test the influency of prompt sensitivity to our GenAL performance.
 
 The part that is used to replace the prompt is the important module to the effectiveness of the recommendation in Local Teaching Agent. It should be note that, the original prompt is designed by educational expert and the other is re-writed by ChatGPT, aiming to enhance reasoning effectiveness.
-
 
 Original Prompt in our paper:
 
